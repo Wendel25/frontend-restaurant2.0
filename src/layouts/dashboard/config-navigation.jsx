@@ -1,42 +1,37 @@
-import SvgColor from 'src/components/svg-color';
+import Cookies from 'js-cookie';
+
+import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
-const icon = (name) => (
-  <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />
-);
+function handleClickLogOut() {
+  Cookies.remove('userId');
+  Cookies.remove('userName');
+  Cookies.remove('userToken');
+}
 
 const navConfig = [
   {
-    title: 'dashboard',
+    title: 'home',
     path: '/',
-    icon: icon('ic_analytics'),
+    icon: <Iconify icon="material-symbols:home" />,
   },
   {
-    title: 'user',
-    path: '/user',
-    icon: icon('ic_user'),
-  },
-  {
-    title: 'product',
+    title: 'produtos',
     path: '/products',
-    icon: icon('ic_cart'),
+    icon: <Iconify icon="mdi:cart" />,
   },
   {
-    title: 'blog',
-    path: '/blog',
-    icon: icon('ic_blog'),
+    title: 'contabilidade',
+    path: '/accounting',
+    icon: <Iconify icon="streamline:payment-10-solid" />,
   },
   {
-    title: 'login',
+    title: 'sair',
     path: '/login',
-    icon: icon('ic_lock'),
-  },
-  {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic_disabled'),
-  },
+    icon: <Iconify icon="clarity:logout-solid" />,
+    onClick: handleClickLogOut
+  }
 ];
 
 export default navConfig;

@@ -1,17 +1,17 @@
 import { Helmet } from 'react-helmet-async';
 
-import { AppView } from 'src/sections/overview/view';
+import { AccountingView } from 'src/sections/accounting';
 
 // ----------------------------------------------------------------------
 
-export default function AppPage() {
+export default function AccountingPage() {
   return (
     <>
       <Helmet>
-        <title> Pedidos | CoddeWaves </title>
+        <title> Contabilidade | CoddeWaves </title>
       </Helmet>
 
-      <AppView />
+      <AccountingView />
     </>
   );
 }

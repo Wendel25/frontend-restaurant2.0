@@ -1,89 +1,80 @@
-import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
 
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
+import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 
-import { fCurrency } from 'src/utils/format-number';
+import returnAllProducts from './services/return-products';
 
-import Label from 'src/components/label';
-import { ColorPreview } from 'src/components/color-utils';
+const baseLinkImage = import.meta.env.LINK_IMAGE || process.env.link_image.LINK_IMAGE;
 
 // ----------------------------------------------------------------------
 
-export default function ShopProductCard({ product }) {
-  const renderStatus = (
-    <Label
-      variant="filled"
-      color={(product.status === 'sale' && 'error') || 'info'}
-      sx={{
-        zIndex: 9,
-        top: 16,
-        right: 16,
-        position: 'absolute',
-        textTransform: 'uppercase',
-      }}
-    >
-      {product.status}
-    </Label>
-  );
+const imageStyle = {
+  width: '100%',
+  height: '220px',
+};
 
-  const renderImg = (
-    <Box
-      component="img"
-      alt={product.name}
-      src={product.cover}
-      sx={{
-        top: 0,
-        width: 1,
-        height: 1,
-        objectFit: 'cover',
-        position: 'absolute',
-      }}
-    />
-  );
+export default function ShopProductCard() {
+  const [productsData, setProductsData] = useState([]);
 
-  const renderPrice = (
-    <Typography variant="subtitle1">
-      <Typography
-        component="span"
-        variant="body1"
-        sx={{
-          color: 'text.disabled',
-          textDecoration: 'line-through',
-        }}
-      >
-        {product.priceSale && fCurrency(product.priceSale)}
-      </Typography>
-      &nbsp;
-      {fCurrency(product.price)}
-    </Typography>
-  );
+  useEffect(() => {
+    async function fetchData() {
+      const data = await returnAllProducts();
+      const productList = Object.values(data).flatMap((category) => category);
+      setProductsData(productList);
+    }
+    fetchData();
+  }, []);
 
   return (
-    <Card>
-      <Box sx={{ pt: '100%', position: 'relative' }}>
-        {product.status && renderStatus}
+    <Grid container spacing={2}>
+      {productsData.map((prod) => (
+        <Grid item key={prod.id} xs={12} sm={6} md={4}>
+          <Card className="min-h-96 relative">
+            <div key={prod.id} className="flex flex-col relative">
+              <div
+                className={`absolute top-4 right-0 p-1 w-20 flex justify-center rounded-md ${
+                  prod?.active ? 'bg-yellow-200' : 'bg-redDisabled'
+                }`}
+              >
+                <span
+                  className={`text-base font-bold tracking-wide	 ${
+                    prod?.active ? 'text-yellow-800' : 'text-white'
+                  }`}
+                >
+                  {prod?.active ? 'Ativo' : 'Inativo'}
+                </span>
+              </div>
 
-        {renderImg}
-      </Box>
+              {prod.banner ? (
+                <img
+                  src={`${baseLinkImage}/${prod?.banner}`}
+                  alt="product banner"
+                  style={imageStyle}
+                />
+              ) : (
+                <div className="flex justify-center items-center rounded-2xl max-h-64 min-h-56 bg-gray">
+                  <ImageNotSupportedIcon sx={{ color: '#929292', fontSize: 150 }} />
+                </div>
+              )}
 
-      <Stack spacing={2} sx={{ p: 3 }}>
-        <Link color="inherit" underline="hover" variant="subtitle2" noWrap>
-          {product.name}
-        </Link>
+              <div className="flex flex-col m-4">
+                <span className="text-xl font-semibold text-zinc-600">{prod?.name}</span>
+                <div className="bg-lime-200 p-1 w-20 flex justify-center rounded-3xl my-4">
+                  <span className="text-sm font-bold text-green-800">R$ {prod?.price}</span>
+                </div>
 
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <ColorPreview colors={product.colors} />
-          {renderPrice}
-        </Stack>
-      </Stack>
-    </Card>
+                <span>
+                  {prod?.description && prod?.description.length > 50
+                    ? `${prod?.description.substring(0, 50)}...`
+                    : prod?.description}
+                </span>
+              </div>
+            </div>
+          </Card>
+        </Grid>
+      ))}
+    </Grid>
   );
 }
-
-ShopProductCard.propTypes = {
-  product: PropTypes.object,
-};
